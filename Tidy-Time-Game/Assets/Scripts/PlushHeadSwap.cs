@@ -1,73 +1,68 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-public class PlushHeadSwap : MonoBehaviour
+private void OnMouseUp()
 {
-    private Vector3 startPosition;
-    private bool isDragging = false;
+    isDragging = false;
 
-    void Start()
-    {
-        startPosition = transform.position;
-    }
+    // Get this head's collider to use its bounds.
+    Collider2D myCollider = GetComponent<Collider2D>();
+    // Use OverlapBoxAll with the collider's center and size.
+    Collider2D[] hitColliders = Physics2D.OverlapBoxAll(myCollider.bounds.center, myCollider.bounds.size, 0f);
 
-    private void OnMouseDown()
-    {
-        Debug.Log(gameObject.name + " clicked");
-        isDragging = true;
-    }
+    PlushHeadSwap targetHead = null;
+    Collider2D targetBody = null;
 
-    private void OnMouseDrag()
+    // Look through all overlapping colliders.
+    foreach (Collider2D col in hitColliders)
     {
-        if (isDragging)
+        // If we find another head (and it isn't ourselves), mark it as the target.
+        if (col.CompareTag("PlushHead") && col.gameObject != gameObject)
         {
-            Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-            transform.position = new Vector3(mousePosition.x, mousePosition.y, 0);
+            targetHead = col.GetComponent<PlushHeadSwap>();
+            break; // Give swapping priority.
+        }
+        // Otherwise, if a body is found, record it.
+        else if (col.CompareTag("PlushBody"))
+        {
+            targetBody = col;
         }
     }
 
-    private void OnMouseUp()
+    if (targetHead != null)
     {
-        isDragging = false;
+        // Swap directly if a head is detected.
+        SwapHeads(targetHead);
+    }
+    else if (targetBody != null)
+    {
+        // Use a slightly relaxed threshold to determine if a head is already attached to this body.
+        float snapThreshold = 0.3f; // Adjust as needed based on your art and collider sizes.
+        PlushHeadSwap attachedHead = null;
 
-        Collider2D hitCollider = Physics2D.OverlapPoint(transform.position);
-
-        if (hitCollider != null)
+        // Search through all heads to find one that is currently snapped to this body.
+        foreach (PlushHeadSwap head in FindObjectsOfType<PlushHeadSwap>())
         {
-            if (hitCollider.CompareTag("PlushHead")) // Swapping with another head
+            if (head != this && Vector3.Distance(head.startPosition, targetBody.transform.position) < snapThreshold)
             {
-                SwapHeads(hitCollider.GetComponent<PlushHeadSwap>());
+                attachedHead = head;
+                break;
             }
-            else if (hitCollider.CompareTag("PlushBody")) // Dropping on an empty body
-            {
-                transform.position = hitCollider.transform.position; // Snap into place
-            }
+        }
+
+        if (attachedHead != null)
+        {
+            // If there is already a head on this body, swap with that head.
+            SwapHeads(attachedHead);
         }
         else
         {
-            Debug.Log("Dropped outside valid area, resetting.");
-            transform.position = startPosition; // Reset if dropped in an invalid area
+            // Otherwise, snap this head to the body's position and update the stored valid position.
+            transform.position = targetBody.transform.position;
+            startPosition = targetBody.transform.position;
         }
     }
-
-    
-    private void SwapHeads(PlushHeadSwap otherHead)
+    else
     {
-        if (otherHead != null && otherHead != this) // Ensure swapping with another head
-        {
-            Debug.Log("Swapping " + gameObject.name + " with " + otherHead.gameObject.name);
-
-            // Store original positions
-            Vector3 firstPosition = transform.position;
-            Vector3 secondPosition = otherHead.transform.position;
-
-            // Swap positions
-            transform.position = secondPosition;
-            otherHead.transform.position = firstPosition;
-        }
-
-        PlushGameManager.Instance.CheckTaskCompletion();
+        UnityEngine.Debug.Log("Dropped outside valid area, resetting.");
+        // If no valid colliders are detected, reset to the last valid (attached) position.
+        transform.position = startPosition;
     }
 }
-
