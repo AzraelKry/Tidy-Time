@@ -18,7 +18,9 @@ public class FishFeedingChore : MonoBehaviour
     [Tooltip("Letters to spawn when fish is fully grown")]
     [SerializeField] private GameObject[] lettersToSpawn;
 
-   
+    [SerializeField] private Item letterItem;
+
+
     //handles click behavior for fish objects 
     private void HandleFishClick()
     {
@@ -64,8 +66,16 @@ public class FishFeedingChore : MonoBehaviour
     //handles click behavior for letter objects
     private void HandleLetterClick()
     {
-        gameObject.SetActive(false);
-        // TODO: add inventory system mechanic
+        //try to add the letter to the inventory
+        if (InventoryManager.instance.AddItem(letterItem))
+        {
+            //successfully added to inventory; disable the letter object
+            gameObject.SetActive(false);
+        }
+        else
+        {
+            Debug.Log("Inventory is full or letter cannot be added.");
+        }
     }
 
 
