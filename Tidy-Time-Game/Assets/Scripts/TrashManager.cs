@@ -7,10 +7,9 @@ public class TrashManager : MonoBehaviour
 
     [Header("UI Elements")]
     public GameObject completionPanel;
-
-    [Header("Effects")]
-    public ParticleSystem confettiEffect;
-    public AudioClip successSound;
+    
+    [Header("Audio")]
+    public AudioSource trashAudioSource; // Reference to configured AudioSource
 
     private void Awake()
     {
@@ -24,82 +23,67 @@ public class TrashManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
+        // Initialize audio source if not set
+        if (trashAudioSource == null)
+        {
+            trashAudioSource = GetComponent<AudioSource>();
+            if (trashAudioSource == null)
+            {
+                trashAudioSource = gameObject.AddComponent<AudioSource>();
+                Debug.LogWarning("Created default AudioSource on TrashManager");
+            }
+        }
     }
 
     private void Start()
     {
         if (ChoreManager.Instance != null)
         {
-            Debug.Log("Checking garbage completion on scene load...");
             if (!ChoreManager.Instance.IsChoreCompleted("garbage"))
             {
                 completionPanel.SetActive(false);
-                Debug.Log("NOT COMPLETE");
             }
             else
             {
                 completionPanel.SetActive(true);
-                Debug.Log("IS COMPLETE");
-
-                // Make all objects with "Trash" tag invisible
                 GameObject[] trashObjects = GameObject.FindGameObjectsWithTag("Trash");
                 foreach (GameObject trash in trashObjects)
                 {
-                    trash.SetActive(false); // Disables the object, making it invisible
+                    trash.SetActive(false);
                 }
             }
         }
-        else
-        {
-            Debug.LogError("ChoreManager instance is null in TrashManager!");
-        }
 
-        // Enable trash pieces that have been collected from other scenes
+        // Initialize trash collection state
         GameObject[] allTrash = GameObject.FindGameObjectsWithTag("Trash");
-
         foreach (GameObject trash in allTrash)
         {
             ItemsIDTracking idTracker = trash.GetComponent<ItemsIDTracking>();
             if (idTracker != null)
             {
-                if (ItemCollectionTracker.IsCollected(idTracker.itemID))
-                {
-                    trash.SetActive(true);
-                    Debug.Log(idTracker.itemID + " was collected — showing trash piece.");
-                }
-                else
-                {
-                    trash.SetActive(false);
-                    Debug.Log(idTracker.itemID + " not collected — hiding trash piece");
-                }
+                trash.SetActive(ItemCollectionTracker.IsCollected(idTracker.itemID));
             }
+        }
+    }
+
+    public void PlayTrashThrowSound()
+    {
+        if (trashAudioSource != null && trashAudioSource.clip != null)
+        {
+            trashAudioSource.Play();
+        }
+        else
+        {
+            Debug.LogWarning("Trash audio not properly configured!");
         }
     }
 
     public void NotifyTrashCompleted()
     {
-        // Show completion UI
         if (completionPanel != null)
         {
             completionPanel.SetActive(true);
-        }
-
-        // Play celebration effects
-        PlayCompletionEffects();
-    }
-
-    private void PlayCompletionEffects()
-    {
-        // Visual effect
-        if (confettiEffect != null)
-        {
-            Instantiate(confettiEffect, Vector3.up * 2f, Quaternion.identity);
-        }
-
-        // Sound effect
-        if (successSound != null && Camera.main != null)
-        {
-            AudioSource.PlayClipAtPoint(successSound, Camera.main.transform.position);
         }
     }
 }
