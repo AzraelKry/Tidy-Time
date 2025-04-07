@@ -19,4 +19,10 @@ public static class ItemCollectionTracker
             Debug.Log("Marked " + itemId + " as collected");
         }
     }
+
+    public static void ResetCollection()
+    {
+        collectedItems.Clear();
+        Debug.Log("Item collection tracker reset.");
+    }
 }
