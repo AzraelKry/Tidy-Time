@@ -185,4 +185,9 @@ public class FishManager : MonoBehaviour
             completionPanel.SetActive(false);
         }
     }
+
+    public bool HasFishBurped()
+    {
+        return hasBurped;
+    }
 }

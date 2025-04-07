@@ -19,6 +19,13 @@ public class TrashBinTrigger : MonoBehaviour
             trashInBinCount++;
             other.tag = "Untagged"; // Prevent double-counting
 
+            // Disable future collision with other trash
+            TrashCollisionDisabling disable = other.GetComponent<TrashCollisionDisabling>();
+            if (disable != null)
+            {
+                disable.DisableCollisionWithOtherTrash();
+            }
+
             if (trashInBinCount >= totalTrashPieces)
             {
                 Debug.Log("All trash is in the bin");
