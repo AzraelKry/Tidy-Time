@@ -18,6 +18,9 @@ public class PlushHeadSwap : MonoBehaviour
     public float hoverAlpha = 0.6f;
     public float hoverBeforePickupAlpha = 0.8f;
 
+    [Header("Audio")]
+    public AudioSource swapAudioSource; // Assign a single shared AudioSource in Inspector
+
     private List<Transform> availableBodies = new List<Transform>();
     private Dictionary<Transform, PlushHeadSwap> bodyToHeadMap = new Dictionary<Transform, PlushHeadSwap>();
     private static List<Transform> occupiedBodies = new List<Transform>();
@@ -98,11 +101,21 @@ public class PlushHeadSwap : MonoBehaviour
     {
         if (availableBodies.Count == 0) return;
 
+        // Create a list of possible bodies excluding our own correct body
         List<Transform> possibleBodies = new List<Transform>();
         foreach (var body in availableBodies)
         {
-            if (body == null) continue;
+            if (body == null || body == correctBody) continue;
             possibleBodies.Add(body);
+        }
+
+        // If no bodies left (edge case with only 1 plushie), use all available
+        if (possibleBodies.Count == 0)
+        {
+            foreach (var body in availableBodies)
+            {
+                if (body != null) possibleBodies.Add(body);
+            }
         }
 
         List<Transform> unoccupiedBodies = new List<Transform>();
@@ -114,6 +127,7 @@ public class PlushHeadSwap : MonoBehaviour
             }
         }
 
+        // If no unoccupied bodies, use all possible bodies
         if (unoccupiedBodies.Count == 0)
         {
             unoccupiedBodies = new List<Transform>(possibleBodies);
@@ -132,6 +146,7 @@ public class PlushHeadSwap : MonoBehaviour
                     otherHead.startPosition = GetRandomPositionNearby(selectedBody.position);
                     otherHead.transform.position = otherHead.startPosition;
                     bodyToHeadMap.Remove(selectedBody);
+                    occupiedBodies.Remove(selectedBody);
                 }
 
                 transform.position = selectedBody.position;
@@ -143,7 +158,11 @@ public class PlushHeadSwap : MonoBehaviour
         }
         else
         {
-            Transform fallbackBody = availableBodies[Random.Range(0, availableBodies.Count)];
+            // Fallback position near a random body (not our own)
+            Transform fallbackBody = possibleBodies.Count > 0 
+                ? possibleBodies[Random.Range(0, possibleBodies.Count)] 
+                : availableBodies[Random.Range(0, availableBodies.Count)];
+            
             startPosition = GetRandomPositionNearby(fallbackBody.position);
             transform.position = startPosition;
         }
@@ -312,6 +331,12 @@ public class PlushHeadSwap : MonoBehaviour
     private void SwapWithHead(PlushHeadSwap otherHead)
     {
         if (otherHead == null) return;
+
+        // Play swap sound using the shared AudioSource
+        if (swapAudioSource != null && !swapAudioSource.isPlaying)
+        {
+            swapAudioSource.Play();
+        }
 
         Vector3 tempPosition = startPosition;
         startPosition = otherHead.startPosition;
