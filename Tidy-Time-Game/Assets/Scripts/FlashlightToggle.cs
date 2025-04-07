@@ -12,7 +12,6 @@ public class FlashlightToggle : MonoBehaviour
     [Header("Audio Sources")]
     public AudioSource normalClickAudio;
     public AudioSource brokenClickAudio;
-    public AudioSource brokenHumAudio;
 
     [Header("Settings")]
     [Range(0f, 1f)] public float brokenLightAlpha = 0.05f; // Dim (5% brightness)
@@ -65,12 +64,6 @@ public class FlashlightToggle : MonoBehaviour
             brokenClickAudio.playOnAwake = false;
             brokenClickAudio.loop = false;
         }
-
-        if (brokenHumAudio != null)
-        {
-            brokenHumAudio.playOnAwake = false;
-            brokenHumAudio.loop = true;
-        }
     }
 
     private void CheckTimeForBrokenState()
@@ -113,7 +106,6 @@ public class FlashlightToggle : MonoBehaviour
     {
         if (normalClickAudio != null) normalClickAudio.Stop();
         if (brokenClickAudio != null) brokenClickAudio.Stop();
-        if (brokenHumAudio != null) brokenHumAudio.Stop();
     }
 
     private void OnButtonPressed()
@@ -133,12 +125,6 @@ public class FlashlightToggle : MonoBehaviour
             PlaySound(brokenClickAudio);
             if (!isFading)
                 StartCoroutine(FadeObject(brokenLightAlpha));
-            
-            // Play broken hum sound
-            if (brokenHumAudio != null && !brokenHumAudio.isPlaying)
-            {
-                brokenHumAudio.Play();
-            }
         }
         else
         {
@@ -162,12 +148,6 @@ public class FlashlightToggle : MonoBehaviour
         if (!isFading && flashCoroutine == null)
         {
             StartCoroutine(FadeObject(0f));
-            
-            // Stop broken hum sound when released
-            if (isBroken && brokenHumAudio != null)
-            {
-                brokenHumAudio.Stop();
-            }
         }
     }
 

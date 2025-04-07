@@ -24,8 +24,8 @@ public class MathChore : MonoBehaviour
     public float wrongAnswerShakeIntensity = 5f;
 
     [Header("Audio")]
-    public AudioClip correctSound;
-    public AudioClip incorrectSound;
+    public AudioSource correctSound;
+    public AudioSource incorrectSound;
     private AudioSource audioSource;
 
     private bool[] completedQuestions = new bool[5];
@@ -124,7 +124,7 @@ public class MathChore : MonoBehaviour
 
         if (isCorrect)
         {
-            if (correctSound != null) audioSource.PlayOneShot(correctSound);
+            if (correctSound != null) correctSound.Play();
 
             completedQuestions[questionIndex] = true;
             answerInputs[questionIndex].interactable = false;
@@ -139,7 +139,7 @@ public class MathChore : MonoBehaviour
         }
         else
         {
-            if (incorrectSound != null) audioSource.PlayOneShot(incorrectSound);
+            if (incorrectSound != null) incorrectSound.Play();
 
             UpdateButtonColor(checkButtons[questionIndex], incorrectColor);
             checkButtons[questionIndex].GetComponent<Image>().color = incorrectColor;

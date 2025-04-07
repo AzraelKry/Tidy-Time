@@ -11,12 +11,24 @@ public class ClosetTaskManager : MonoBehaviour
     public GameObject finalUi; // UI after completion (no bubbles)
     public GameObject completionPanel; // UI panel shown on completion
 
+    [Header("Audio")]
+    public AudioSource placementSound; // Sound when any clothing is placed
+
     private bool taskComplete = false;
     private List<GameObject> clothingQueue = new List<GameObject>();
     private int currentItemIndex = 0;
+    private bool[] wasActiveLastFrame; // Track previous frame state
 
     void Start()
     {
+        wasActiveLastFrame = new bool[clothingItems.Length];
+        
+        // Initialize tracking array
+        for (int i = 0; i < clothingItems.Length; i++)
+        {
+            wasActiveLastFrame[i] = clothingItems[i].activeSelf;
+        }
+
         // Check completion if ChoreManager exists in scene
         if (ChoreManager.Instance != null && ChoreManager.Instance.IsChoreCompleted("organizecloset"))
         {
@@ -45,7 +57,6 @@ public class ClosetTaskManager : MonoBehaviour
                 Debug.Log("Hiding already collected item - " + idTracker.itemID);
             }
         }
-
     }
 
     void Update()
@@ -60,10 +71,29 @@ public class ClosetTaskManager : MonoBehaviour
                 clothingQueue[currentItemIndex].SetActive(true);
         }
 
+        // Check each item for placement changes
+        for (int i = 0; i < clothingItems.Length; i++)
+        {
+            bool isActiveNow = clothingItems[i].activeSelf;
+            
+            // If was active last frame but not now = just placed
+            if (wasActiveLastFrame[i] && !isActiveNow)
+            {
+                if (placementSound != null)
+                {
+                    placementSound.Play();
+                    Debug.Log("Played placement sound for item " + i);
+                }
+            }
+            
+            // Update tracking for next frame
+            wasActiveLastFrame[i] = isActiveNow;
+        }
+
         bool allClothesPlaced = true;
         foreach (GameObject item in clothingItems)
         {
-            if (item.activeSelf) // If still visible -> not placed yet
+            if (item.activeSelf)
             {
                 allClothesPlaced = false;
                 break;
@@ -73,7 +103,7 @@ public class ClosetTaskManager : MonoBehaviour
         bool allCollected = true;
         foreach (GameObject item in collectables)
         {
-            if (item.activeSelf) // If still visible -> not collected yet
+            if (item.activeSelf)
             {
                 allCollected = false;
                 break;
@@ -88,7 +118,7 @@ public class ClosetTaskManager : MonoBehaviour
 
             if (uiWithHints != null) uiWithHints.SetActive(false);
             if (finalUi != null) finalUi.SetActive(true);
-            if (completionPanel != null) completionPanel.SetActive(true); // Activate completion panel
+            if (completionPanel != null) completionPanel.SetActive(true);
         }
     }
 
@@ -96,7 +126,7 @@ public class ClosetTaskManager : MonoBehaviour
     {
         if (uiWithHints != null) uiWithHints.SetActive(false);
         if (finalUi != null) finalUi.SetActive(true);
-        if (completionPanel != null) completionPanel.SetActive(true); // Ensure completion panel shows if already done
+        if (completionPanel != null) completionPanel.SetActive(true);
 
         foreach (GameObject item in clothingItems)
             item.SetActive(false);

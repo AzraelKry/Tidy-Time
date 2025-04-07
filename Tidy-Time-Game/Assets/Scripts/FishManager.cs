@@ -18,14 +18,18 @@ public class FishManager : MonoBehaviour
     private int clickCount = 0;
 
     [Header("UI Settings")]
-    public GameObject completionPanel; // Assign a UI panel in the inspector
+    public GameObject completionPanel;
+
+    [Header("Audio Settings")]
+    public AudioSource clickSound; // Sound when clicking the fish
+    public AudioSource burpSound;  // Sound when fish burps
+    public AudioSource feedSound;  // Sound when feeding fish
+    public AudioSource letterSound; // Sound when collecting letters
 
     private bool isFed = false;
     private bool hasBurped = false;
-
     private int lettersCollected = 0;
     private bool isFeedFishCompleted = false;
-
 
     void Start()
     {
@@ -64,7 +68,6 @@ public class FishManager : MonoBehaviour
             }
         }
 
-
         // Set initial states
         fishSmall.SetActive(true);
         fishBig.SetActive(false);
@@ -80,7 +83,13 @@ public class FishManager : MonoBehaviour
         fishFood.SetActive(false);
         fishSmall.SetActive(false);
         fishBig.SetActive(true);
-
+        
+        // Play feeding sound
+        if (feedSound != null)
+        {
+            feedSound.Play();
+        }
+        
         Debug.Log("Fish has been fed.");
     }
 
@@ -89,6 +98,12 @@ public class FishManager : MonoBehaviour
         if (!isFed || hasBurped) return;
 
         clickCount++;
+
+        // Play click sound
+        if (clickSound != null)
+        {
+            clickSound.Play();
+        }
 
         Debug.Log("Big fish clicked. Click count: " + clickCount);
 
@@ -107,6 +122,12 @@ public class FishManager : MonoBehaviour
     {
         hasBurped = true;
 
+        // Play burp sound
+        if (burpSound != null)
+        {
+            burpSound.Play();
+        }
+
         // Spawn letters
         foreach (GameObject letter in letters)
         {
@@ -124,20 +145,19 @@ public class FishManager : MonoBehaviour
 
     public void CollectLetter(GameObject letter)
     {
-        // Debug to check if the letter collection is triggered
         Debug.Log("Attempting to collect: " + letter.name);
-
-        // Deactivate the collected letter
         letter.SetActive(false);
         lettersCollected++;
-
-        // Debug statement to confirm letter collection
+        
+        // Play letter collection sound
+        if (letterSound != null)
+        {
+            letterSound.Play();
+        }
+        
         Debug.Log(letter.name + " collected. Total collected: " + lettersCollected);
-
-        // Ensure we log the state after each collection
         Debug.Log("Letters collected so far: " + lettersCollected + " out of 4.");
 
-        // Check if all letters have been collected
         if (lettersCollected == 4 && !isFeedFishCompleted)
         {
             CompleteFishChore();
@@ -149,16 +169,12 @@ public class FishManager : MonoBehaviour
         isFeedFishCompleted = true;
         Debug.Log("FISH TASK COMPLETED - All letters collected.");
 
-        // Mark chore as completed in ChoreManager
         if (ChoreManager.Instance != null)
         {
             ChoreManager.Instance.CompleteChore("feedfish");
         }
 
-        // Save the task completion state to PlayerPrefs
         PlayerPrefs.SetInt("FeedFishCompleted", 1);
-
-        // Show completion UI panel
         ShowCompletionUI();
     }
 
@@ -167,8 +183,6 @@ public class FishManager : MonoBehaviour
         if (completionPanel != null)
         {
             completionPanel.SetActive(true);
-
-            // Optional: Add any UI animation or sound here
             Debug.Log("Showing completion UI panel");
         }
         else
@@ -177,7 +191,6 @@ public class FishManager : MonoBehaviour
         }
     }
 
-    // Optional: Add a method to hide the UI panel if needed
     public void HideCompletionUI()
     {
         if (completionPanel != null)

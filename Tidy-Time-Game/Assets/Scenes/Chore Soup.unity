@@ -308,8 +308,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &37226950
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -418,8 +416,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &198108905
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -528,8 +524,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &221741373
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -727,8 +721,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &284106718
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -926,8 +918,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &288966618
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -1036,8 +1026,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &301644074
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -1369,8 +1357,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &416179507
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -1414,6 +1400,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   completionPanel: {fileID: 621349042}
   choreName: AlphabetSoup
+  letterSound: {fileID: 1635387912}
 --- !u!4 &418906944
 Transform:
   m_ObjectHideFlags: 0
@@ -1614,8 +1601,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &485431475
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -1725,8 +1710,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &486644984
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -2220,8 +2203,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &568358049
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -2234,6 +2215,39 @@ CanvasGroup:
   m_Interactable: 1
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
+--- !u!1 &606604792
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 606604793}
+  m_Layer: 0
+  m_Name: Sound Effects
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &606604793
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 606604792}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.13856784, y: 0.25568196, z: 0.037288938}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1802642323}
+  - {fileID: 1635387911}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &618298001
 GameObject:
   m_ObjectHideFlags: 0
@@ -2474,8 +2488,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &702560067
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -2762,8 +2774,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &951486510
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -2872,8 +2882,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &953408502
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -2982,8 +2990,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &970738246
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -3181,8 +3187,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &1015094230
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -3380,8 +3384,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &1040833344
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -3580,8 +3582,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &1168244868
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -3792,8 +3792,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &1261692419
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -3902,8 +3900,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &1295660307
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -4275,8 +4271,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &1458576121
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -4702,6 +4696,134 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6670a81aa6da76b43898b5e6bfba094d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1635387910
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1635387911}
+  - component: {fileID: 1635387912}
+  m_Layer: 0
+  m_Name: Letter drop in cereal milk ES
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1635387911
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1635387910}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.13856784, y: -0.25568196, z: -0.037288938}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 606604793}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &1635387912
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1635387910}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 15bb82e15a6874d4dad91db1b036f8bc, type: 3}
+  m_PlayOnAwake: 0
+  m_Volume: 0.2
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &1636152783
 GameObject:
   m_ObjectHideFlags: 0
@@ -4887,8 +5009,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &1669879662
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -4990,6 +5110,134 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6670a81aa6da76b43898b5e6bfba094d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &1802642322
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1802642323}
+  - component: {fileID: 1802642324}
+  m_Layer: 0
+  m_Name: Alphabet Soup Open ES
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1802642323
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802642322}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.13856784, y: -0.25568196, z: -0.037288938}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 606604793}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &1802642324
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1802642322}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 8300000, guid: 0706f2e3bb841b4468147bbe6667a038, type: 3}
+  m_PlayOnAwake: 1
+  m_Volume: 0.15
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!1 &1842582332
 GameObject:
   m_ObjectHideFlags: 0
@@ -5086,8 +5334,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &1842582337
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -5196,8 +5442,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &1845463997
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -5720,8 +5964,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &2058729422
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -5919,8 +6161,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &2067393925
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -6131,8 +6371,6 @@ MonoBehaviour:
   startParent: {fileID: 0}
   isCorrectlyPlaced: 0
   hoverAlpha: 0.7
-  dropSound: {fileID: 0}
-  correctPlacementSound: {fileID: 0}
 --- !u!225 &2091150948
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -6257,3 +6495,4 @@ SceneRoots:
   - {fileID: 618298004}
   - {fileID: 1610801209}
   - {fileID: 418906944}
+  - {fileID: 606604793}

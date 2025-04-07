@@ -17,10 +17,6 @@ public class DraggableLetter : MonoBehaviour, IBeginDragHandler, IDragHandler, I
     [Range(0.1f, 1f)]
     public float hoverAlpha = 0.7f;
     
-    [Header("Audio")]
-    public AudioClip dropSound;
-    public AudioClip correctPlacementSound;
-    
     private float originalAlpha;
     private SoupManager soupManager;
 
@@ -89,7 +85,11 @@ public class DraggableLetter : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         }
         else
         {
-            PlayDropSound();
+            // Only play sound when successfully dropped onto a new spot
+            if (soupManager != null) 
+            {
+                soupManager.PlayLetterSound();
+            }
             CheckPlacement();
         }
     }
@@ -100,14 +100,11 @@ public class DraggableLetter : MonoBehaviour, IBeginDragHandler, IDragHandler, I
         
         if (newCorrectState && !isCorrectlyPlaced)
         {
-            Debug.Log($"Correct! {name} placed on correct placeholder");
             isCorrectlyPlaced = true;
-            PlayCorrectSound();
             CheckAllLettersCorrect();
         }
         else if (!newCorrectState && isCorrectlyPlaced)
         {
-            Debug.Log($"{name} moved from correct position");
             isCorrectlyPlaced = false;
         }
     }
@@ -128,26 +125,9 @@ public class DraggableLetter : MonoBehaviour, IBeginDragHandler, IDragHandler, I
             if (!letter.isCorrectlyPlaced) return;
         }
         
-        Debug.Log("PUZZLE COMPLETE! ALL LETTERS CORRECT!");
         if (soupManager != null)
         {
             soupManager.CheckForCompletion();
-        }
-    }
-
-    private void PlayDropSound()
-    {
-        if (dropSound != null)
-        {
-            AudioSource.PlayClipAtPoint(dropSound, Camera.main.transform.position);
-        }
-    }
-
-    private void PlayCorrectSound()
-    {
-        if (correctPlacementSound != null)
-        {
-            AudioSource.PlayClipAtPoint(correctPlacementSound, Camera.main.transform.position);
         }
     }
 

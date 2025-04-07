@@ -4,21 +4,24 @@ public class SoupManager : MonoBehaviour
 {
     [Header("UI References")]
     public GameObject completionPanel;
-    
+
     [Header("Chore Settings")]
     public string choreName = "AlphabetSoup";
-    
+
+    [Header("Audio Settings")]
+    public AudioSource letterSound; // Single sound for letter drops
+
     private LetterRandomizer letterRandomizer;
 
     private void Start()
     {
         letterRandomizer = FindObjectOfType<LetterRandomizer>();
-        
+
         if (completionPanel != null)
         {
             completionPanel.SetActive(false);
         }
-        
+
         if (ChoreManager.Instance != null && ChoreManager.Instance.IsChoreCompleted(choreName))
         {
             PlaceLettersCorrectly();
@@ -40,18 +43,17 @@ public class SoupManager : MonoBehaviour
                 ItemsIDTracking idTracker = letter.GetComponent<ItemsIDTracking>();
                 if (idTracker != null && idTracker.itemID == letterID)
                 {
-                    if (!ItemCollectionTracker.IsCollected(letterID))
-                    {
-                        // Hide the letter if it hasn't been collected yet
-                        letter.gameObject.SetActive(false);
-                        Debug.Log(letterID + " not collected — hiding");
-                    }
-                    else
-                    {
-                        Debug.Log(letterID + " was collected — showing");
-                    }
+                    letter.gameObject.SetActive(ItemCollectionTracker.IsCollected(letterID));
                 }
             }
+        }
+    }
+
+    public void PlayLetterSound()
+    {
+        if (letterSound != null)
+        {
+            letterSound.PlayOneShot(letterSound.clip);
         }
     }
 
@@ -62,7 +64,7 @@ public class SoupManager : MonoBehaviour
         {
             if (!letter.isCorrectlyPlaced) return;
         }
-        
+
         CompleteSoupChore();
     }
 
@@ -87,7 +89,7 @@ public class SoupManager : MonoBehaviour
     {
         DraggableLetter[] allLetters = FindObjectsOfType<DraggableLetter>();
         LetterPlaceholder[] allPlaceholders = FindObjectsOfType<LetterPlaceholder>();
-        
+
         foreach (DraggableLetter letter in allLetters)
         {
             string letterName = letter.name.Replace("Letter ", "");
