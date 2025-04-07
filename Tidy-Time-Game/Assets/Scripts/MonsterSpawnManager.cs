@@ -18,6 +18,7 @@ public class MonsterSpawnManager : MonoBehaviour
     private float monsterSpawnDuration = 20f;
     private bool gameOverTriggered = false;
     private bool finalSequenceActive = false;
+    private bool monsterDisabled = false;
 
     void Awake()
     {
@@ -32,6 +33,8 @@ public class MonsterSpawnManager : MonoBehaviour
                 monsterAudioSource.volume = 0.3f;
                 monsterAudioSource.playOnAwake = false;
             }
+
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
         {
@@ -45,11 +48,16 @@ public class MonsterSpawnManager : MonoBehaviour
         StartCoroutine(MonsterSpawnLoop());
     }
 
+    void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
     IEnumerator MonsterSpawnLoop()
     {
         yield return new WaitForSeconds(3f);
 
-        while (!gameOverTriggered && !finalSequenceActive)
+        while (!gameOverTriggered && !finalSequenceActive && !monsterDisabled)
         {
             float progress = GetTimeProgress();
             float currentMinCooldown = Mathf.Lerp(initialSpawnCooldownMin, finalSpawnCooldownMin, progress);
@@ -60,7 +68,7 @@ public class MonsterSpawnManager : MonoBehaviour
 
             yield return new WaitForSeconds(cooldown);
 
-            if (!finalSequenceActive)
+            if (!finalSequenceActive && !monsterDisabled)
             {
                 yield return StartCoroutine(SpawnMonsterRoutine());
             }
@@ -69,16 +77,18 @@ public class MonsterSpawnManager : MonoBehaviour
 
     IEnumerator SpawnMonsterRoutine()
     {
+        if (monsterDisabled) yield break;
+
         monsterIsActive = true;
         Debug.Log("[Monster] Monster has spawned!");
 
-        if (monsterAudioSource != null)
+        if (monsterAudioSource != null && !monsterDisabled)
         {
             monsterAudioSource.Play();
         }
 
         float timeWaited = 0f;
-        while (timeWaited < monsterSpawnDuration && !finalSequenceActive)
+        while (timeWaited < monsterSpawnDuration && !finalSequenceActive && !monsterDisabled)
         {
             if (!monsterIsActive)
             {
@@ -94,7 +104,7 @@ public class MonsterSpawnManager : MonoBehaviour
             timeWaited += 1f;
         }
 
-        if (monsterIsActive && !finalSequenceActive)
+        if (monsterIsActive && !finalSequenceActive && !monsterDisabled)
         {
             TriggerGameOver();
         }
@@ -102,6 +112,8 @@ public class MonsterSpawnManager : MonoBehaviour
 
     public void TriggerFinalSequence()
     {
+        if (monsterDisabled) return;
+
         finalSequenceActive = true;
         Debug.Log("[Monster] Starting final sequence!");
 
@@ -117,11 +129,13 @@ public class MonsterSpawnManager : MonoBehaviour
 
     IEnumerator ForceSpawnMonster()
     {
+        if (monsterDisabled) yield break;
+
         monsterIsActive = true;
         Debug.Log("[Monster] Final monster spawn initiated!");
 
         // Wait until 8:40 (4 hours 40 minutes in game time)
-        while (true)
+        while (!monsterDisabled)
         {
             TimerScript timer = FindObjectOfType<TimerScript>();
             if (timer != null)
@@ -135,6 +149,8 @@ public class MonsterSpawnManager : MonoBehaviour
             yield return new WaitForSeconds(1f);
         }
 
+        if (monsterDisabled) yield break;
+
         // Now it's 8:40 - start the monster sound
         if (monsterAudioSource != null)
         {
@@ -145,12 +161,15 @@ public class MonsterSpawnManager : MonoBehaviour
         // Wait for 20 seconds before jumpscare
         yield return new WaitForSeconds(20f);
 
-        TriggerGameOver();
+        if (!monsterDisabled)
+        {
+            TriggerGameOver();
+        }
     }
 
     public void ScareAwayMonster()
     {
-        if (monsterIsActive && !finalSequenceActive)
+        if (monsterIsActive && !finalSequenceActive && !monsterDisabled)
         {
             monsterIsActive = false;
             if (monsterAudioSource != null && monsterAudioSource.isPlaying)
@@ -162,14 +181,14 @@ public class MonsterSpawnManager : MonoBehaviour
 
     public void TriggerGameOver()
     {
-        if (gameOverTriggered) return;
+        if (gameOverTriggered || monsterDisabled) return;
 
         gameOverTriggered = true;
         Debug.Log("[Monster] Triggering game over!");
         SceneManager.LoadScene(12); // Jumpscare scene
     }
 
-    public bool IsMonsterActive() => monsterIsActive;
+    public bool IsMonsterActive() => monsterIsActive && !monsterDisabled;
 
     private float GetTimeProgress()
     {
@@ -186,14 +205,25 @@ public class MonsterSpawnManager : MonoBehaviour
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        if (scene.buildIndex == 10) // Call Mom scene
+        // Disable monster in Main Menu (0) or Call Mom (10) scenes
+        if (scene.buildIndex == 0 || scene.buildIndex == 10)
         {
-            CleanUpForCallMom();
+            monsterDisabled = true;
+            CleanUpMonster();
+        }
+        else
+        {
+            monsterDisabled = false;
         }
     }
 
-    void CleanUpForCallMom()
+    void CleanUpMonster()
     {
+        // Stop all monster-related activities
+        monsterIsActive = false;
+        finalSequenceActive = false;
+        gameOverTriggered = true; // Prevent any further jumpscares
+
         if (monsterAudioSource != null && monsterAudioSource.isPlaying)
         {
             monsterAudioSource.Stop();
@@ -201,11 +231,14 @@ public class MonsterSpawnManager : MonoBehaviour
 
         StopAllCoroutines();
 
-        if (monsterAudioSource != null)
+        // If we're in the main menu, destroy everything
+        if (SceneManager.GetActiveScene().buildIndex == 0)
         {
-            Destroy(monsterAudioSource.gameObject);
+            if (monsterAudioSource != null)
+            {
+                Destroy(monsterAudioSource.gameObject);
+            }
+            Destroy(gameObject);
         }
-
-        Destroy(gameObject);
     }
 }
