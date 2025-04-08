@@ -34,7 +34,6 @@ public class MathChore : MonoBehaviour
     private List<int> correctAnswers = new List<int>();
 
     private bool firstSetCompleted = false;
-    private bool secondSetGenerated = false;
 
     private void Start()
     {
@@ -72,21 +71,21 @@ public class MathChore : MonoBehaviour
             
             if (op == "+")
             {
-                // Make 0 less likely in addition (30% chance for 0, 70% for 1-9)
-                num1 = Random.value < 0.7f ? Random.Range(1, 10) : 0;
+                // Make 0 less likely in addition (10% chance for 0, 90% for 1-9)
+                num1 = Random.value < 0.9f ? Random.Range(1, 10) : 0;
                 num2 = Random.Range(0, 10 - num1);
                 result = num1 + num2;
             }
             else // Subtraction
             {
                 // Make 0 and 1 less likely in subtraction
-                num1 = Random.value < 0.7f ? Random.Range(2, 10) : Random.Range(0, 2);
-                num2 = Random.Range(0, num1 + 1);
+                num1 = Random.value < 0.9f ? Random.Range(2, 10) : Random.Range(0, 2);
+                num2 = Random.Range(0, num1);
                 
                 // Ensure we don't get subtraction problems like x-0 too often
-                if (Random.value < 0.7f && num2 == 0)
+                if (Random.value < 0.9f && num2 == 0)
                 {
-                    num2 = Random.Range(1, num1 + 1);
+                    num2 = Random.Range(1, num1);
                 }
                 
                 result = num1 - num2;
@@ -391,7 +390,6 @@ public class MathChore : MonoBehaviour
 
     private void SwitchToAdvancedSet()
     {
-        secondSetGenerated = true;
         GenerateAdvancedQuestions();
         SetupUI();
     }

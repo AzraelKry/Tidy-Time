@@ -13,6 +13,7 @@ public class PlushHeadSwap : MonoBehaviour
 
     public Transform correctBody;
     public float snapThreshold = 0.5f;
+    public float expandedSnapThreshold = 1.2f; // Larger threshold when hovering
     public float lockThreshold = 0.3f;
     public float hoverAlpha = 0.6f;
     public float hoverBeforePickupAlpha = 0.8f;
@@ -31,7 +32,6 @@ public class PlushHeadSwap : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
         originalColor = spriteRenderer.color;
 
-        // Reset static variables if needed
         if (shouldResetOnLoad)
         {
             allBodies.Clear();
@@ -40,7 +40,6 @@ public class PlushHeadSwap : MonoBehaviour
             shouldResetOnLoad = false;
         }
 
-        // Initialize the list of all bodies once
         if (!initialized)
         {
             initialized = true;
@@ -57,11 +56,9 @@ public class PlushHeadSwap : MonoBehaviour
 
     void Start()
     {
-        // Assign to a random unoccupied body position at start
         List<Transform> availableBodies = new List<Transform>(allBodies);
         availableBodies.Remove(correctBody);
 
-        // Remove already occupied bodies
         List<Transform> occupiedBodies = new List<Transform>(bodyToHeadMap.Keys);
         availableBodies.RemoveAll(body => occupiedBodies.Contains(body));
 
@@ -133,7 +130,7 @@ public class PlushHeadSwap : MonoBehaviour
                 if (bodyToHeadMap.ContainsKey(body))
                 {
                     PlushHeadSwap otherHead = bodyToHeadMap[body];
-                    if (otherHead != this && Vector3.Distance(transform.position, body.position) < snapThreshold)
+                    if (otherHead != this && Vector3.Distance(transform.position, body.position) < expandedSnapThreshold)
                     {
                         otherHead.SetTransparency(swapHighlightAlpha);
                     }
@@ -155,14 +152,35 @@ public class PlushHeadSwap : MonoBehaviour
 
         Transform closestBody = null;
         float closestDistance = float.MaxValue;
+        float currentThreshold = snapThreshold;
 
+        // Check if we're near any body that has a head
         foreach (Transform body in allBodies)
         {
-            float distance = Vector3.Distance(transform.position, body.position);
-            if (distance < snapThreshold && distance < closestDistance)
+            if (bodyToHeadMap.ContainsKey(body))
             {
-                closestDistance = distance;
-                closestBody = body;
+                float distance = Vector3.Distance(transform.position, body.position);
+                if (distance < expandedSnapThreshold && distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closestBody = body;
+                    // Use expanded threshold if we're hovering over another head
+                    currentThreshold = expandedSnapThreshold;
+                }
+            }
+        }
+
+        // If no head bodies found, check all bodies with normal threshold
+        if (closestBody == null)
+        {
+            foreach (Transform body in allBodies)
+            {
+                float distance = Vector3.Distance(transform.position, body.position);
+                if (distance < snapThreshold && distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closestBody = body;
+                }
             }
         }
 
