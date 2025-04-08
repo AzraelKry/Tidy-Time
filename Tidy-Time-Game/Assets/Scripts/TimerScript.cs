@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class TimerScript : MonoBehaviour
 {
     public TextMeshProUGUI timeText;
-    private int currentHour = 4;
+    private int currentHour = 6;
     private int currentMinute = 0;
     private int currentSecond = 0;
     private bool isRunning = true;
@@ -103,7 +103,7 @@ public class TimerScript : MonoBehaviour
     public void ResetTimerToDefault()
     {
         StopAllCoroutines();
-        currentHour = 4;
+        currentHour = 6;
         currentMinute = 0;
         currentSecond = 0;
         isRunning = false;
@@ -161,7 +161,7 @@ public class TimerScript : MonoBehaviour
     public void RestartTimer()
     {
         StopAllCoroutines();
-        currentHour = 4;
+        currentHour = 6;
         currentMinute = 0;
         currentSecond = 0;
         isRunning = true;

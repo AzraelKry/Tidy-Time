@@ -64,7 +64,7 @@ public class MonsterSpawnManager : MonoBehaviour
             float currentMaxCooldown = Mathf.Lerp(initialSpawnCooldownMax, finalSpawnCooldownMax, progress);
 
             float cooldown = Random.Range(currentMinCooldown, currentMaxCooldown);
-            Debug.Log($"[Monster] Next spawn in {cooldown:F1} seconds");
+            Debug.Log($"[Monster] Next spawn in {cooldown:F1} seconds (Progress: {progress:P0})");
 
             yield return new WaitForSeconds(cooldown);
 
@@ -134,14 +134,14 @@ public class MonsterSpawnManager : MonoBehaviour
         monsterIsActive = true;
         Debug.Log("[Monster] Final monster spawn initiated!");
 
-        // Wait until 8:40 (4 hours 40 minutes in game time)
+        // Wait until 8:40 (2 hours 40 minutes in game time since start at 6pm)
         while (!monsterDisabled)
         {
             TimerScript timer = FindObjectOfType<TimerScript>();
             if (timer != null)
             {
                 float currentTime = timer.GetCurrentHour() + (timer.GetCurrentMinute() / 60f);
-                if (currentTime >= 4 + (40f / 60f)) // 4:40 in game time = 8:40 real time
+                if (currentTime >= 8 + (40f / 60f)) // 8:40 in game time
                 {
                     break;
                 }
@@ -158,7 +158,7 @@ public class MonsterSpawnManager : MonoBehaviour
             Debug.Log("[Monster] Final sequence monster sound started at 8:40!");
         }
 
-        // Wait for 20 seconds before jumpscare
+        // Wait for 20 seconds before jumpscare (until exactly 9:00)
         yield return new WaitForSeconds(20f);
 
         if (!monsterDisabled)
@@ -200,7 +200,11 @@ public class MonsterSpawnManager : MonoBehaviour
             return 0f;
         }
 
-        return Mathf.Clamp01((timer.GetCurrentHour() - 4 + timer.GetCurrentMinute() / 60f) / 5f);
+        // Calculate progress from 6pm (0) to 9pm (1)
+        float currentHour = timer.GetCurrentHour();
+        float currentMinute = timer.GetCurrentMinute();
+        float totalMinutes = (currentHour - 6) * 60 + currentMinute;
+        return Mathf.Clamp01(totalMinutes / 180f); // 180 minutes = 3 hours
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)

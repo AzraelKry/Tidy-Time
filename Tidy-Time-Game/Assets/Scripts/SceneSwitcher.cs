@@ -32,7 +32,7 @@ public class SceneSwitcher : MonoBehaviour
         TimerScript timer = FindObjectOfType<TimerScript>();
         if (timer != null)
         {
-            timer.SetTime(4, 0, 0); // Set to 4 PM
+            timer.SetTime(6, 0, 0);
             timer.RestartTimer();
         }
 
@@ -182,7 +182,7 @@ public class SceneSwitcher : MonoBehaviour
         TimerScript timer = FindObjectOfType<TimerScript>();
         if (timer != null)
         {
-            timer.SetTime(4, 0, 0); // Set to 4 PM
+            timer.SetTime(6, 0, 0);
             timer.RestartTimer();
         }
     }
