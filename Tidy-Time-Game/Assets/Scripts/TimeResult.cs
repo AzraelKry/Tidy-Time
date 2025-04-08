@@ -71,27 +71,27 @@ public class TimeResult : MonoBehaviour
         if (rankD != null) rankD.SetActive(false);
         
         // Determine which rank sprite to show and set appropriate text
-        if (totalMinutes < 7 * 60) // Before 6:50
+        if (totalMinutes < 7 * 60) // Before 7
         {
             if (rankAPlusPlus != null) rankAPlusPlus.SetActive(true);
             if (rankDescriptionText != null) rankDescriptionText.text = aPlusPlusText;
         }
-        else if (totalMinutes < 7 * 60 + 30) // Between 6:50 and 7:20
+        else if (totalMinutes < 7 * 60 + 30) // Between 7 and 7:30
         {
             if (rankAPlus != null) rankAPlus.SetActive(true);
             if (rankDescriptionText != null) rankDescriptionText.text = aPlusText;
         }
-        else if (totalMinutes < 7 * 60 + 50) // Between 7:20 and 7:40
+        else if (totalMinutes < 7 * 60 + 50) // Between 7:30 and 7:50
         {
             if (rankA != null) rankA.SetActive(true);
             if (rankDescriptionText != null) rankDescriptionText.text = aText;
         }
-        else if (totalMinutes < 8 * 60 + 10) // Between 7:40 and 8:00
+        else if (totalMinutes < 8 * 60 + 10) // Between 7:50 and 8:10
         {
             if (rankB != null) rankB.SetActive(true);
             if (rankDescriptionText != null) rankDescriptionText.text = bText;
         }
-        else if (totalMinutes < 8 * 60 + 30) // Between 8:00 and 8:30
+        else if (totalMinutes < 8 * 60 + 30) // Between 8:10 and 8:30
         {
             if (rankC != null) rankC.SetActive(true);
             if (rankDescriptionText != null) rankDescriptionText.text = cText;
