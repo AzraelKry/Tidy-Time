@@ -14,10 +14,12 @@ public class TrashThrow : MonoBehaviour
 
     private Vector3 originalPosition;
     private bool hasLaunched = false;
+    private int originalLayer; // Store original layer
 
     void Start()
     {
         originalPosition = transform.position;
+        originalLayer = gameObject.layer; // Store the original layer
         rb = GetComponent<Rigidbody2D>();
         lineRenderer = GetComponent<LineRenderer>();
         rb.bodyType = RigidbodyType2D.Kinematic;
@@ -95,5 +97,6 @@ public class TrashThrow : MonoBehaviour
         rb.gravityScale = 0f;
         transform.position = originalPosition;
         hasLaunched = false;
+        gameObject.layer = originalLayer; // Reset to original layer
     }
 }
