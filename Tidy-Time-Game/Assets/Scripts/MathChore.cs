@@ -69,7 +69,7 @@ public class MathChore : MonoBehaviour
             string op = operators[Random.Range(0, operators.Length)];
             int num1, num2, result;
 
-            if (op == "+")
+            if (op == "+") // Addition
             {
                 // 5% chance for 0 or 1, 95% chance for 2-9
                 num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
