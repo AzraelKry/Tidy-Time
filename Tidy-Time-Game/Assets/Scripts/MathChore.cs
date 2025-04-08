@@ -80,12 +80,22 @@ public class MathChore : MonoBehaviour
                     // For addition, ensure sum doesn't exceed 9
                     // Calculate maximum possible second number
                     int maxSecondNum = 9 - num1;
-                    if (maxSecondNum < 0) maxSecondNum = 0;
+                    if (maxSecondNum <= 0)
+                    {
+                        // If num1 is 9, maxSecondNum would be 0
+                        // If num1 is 8, maxSecondNum would be 1
+                        // So we'll adjust num1 to ensure we don't get 8+2 or similar
+                        continue; // Skip this iteration and try again
+                    }
 
                     // 5% chance for 0 or 1, 95% chance for 2-maxSecondNum
                     num2 = Random.value < 0.05f ? Random.Range(0, Mathf.Min(2, maxSecondNum + 1)) : Random.Range(2, maxSecondNum + 1);
                     result = num1 + num2;
-                    validQuestion = true; // Now guaranteed to be ≤ 9
+
+                    // Double-check that result is <= 9
+                    if (result > 9) continue;
+
+                    validQuestion = true;
                 }
                 else // Subtraction
                 {
@@ -131,8 +141,8 @@ public class MathChore : MonoBehaviour
         bool hasMultiplication = false;
         while (!hasMultiplication)
         {
-            int num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
-            int num2 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
+            int num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 4); // Limit first number for multiplication to ensure product ≤ 9
+            int num2 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 4); // Limit second number for multiplication
             int result = num1 * num2;
 
             if (result <= 9)
@@ -159,31 +169,38 @@ public class MathChore : MonoBehaviour
             {
                 // 5% chance for 0 or 1, 95% chance for 2-9
                 num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
-                num2 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
 
                 if (op == "*")
                 {
+                    // For multiplication, ensure product ≤ 9
+                    // Limit second number based on first number
+                    int maxSecondNum = num1 == 0 ? 9 : Mathf.FloorToInt(9f / num1);
+                    if (maxSecondNum < 2)
+                    {
+                        continue; // Skip and try again
+                    }
+
+                    num2 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, maxSecondNum + 1);
                     result = num1 * num2;
                     validQuestion = result <= 9;
                 }
                 else if (op == "+")
                 {
                     // Ensure sum doesn't exceed 9
-                    if (num1 + num2 > 9)
+                    int maxSecondNum = 9 - num1;
+                    if (maxSecondNum <= 0)
                     {
-                        num2 = 9 - num1;
-                        if (num2 < 0) num2 = 0;
+                        continue; // Skip and try again
                     }
+
+                    num2 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, maxSecondNum + 1);
                     result = num1 + num2;
-                    validQuestion = true;
+                    validQuestion = result <= 9;
                 }
                 else // Subtraction
                 {
                     // Ensure no negative results
-                    if (num2 > num1)
-                    {
-                        num2 = num1;
-                    }
+                    num2 = Random.value < 0.05f ? Random.Range(0, Mathf.Min(2, num1 + 1)) : Random.Range(2, num1 + 1);
                     result = num1 - num2;
                     validQuestion = true;
                 }
