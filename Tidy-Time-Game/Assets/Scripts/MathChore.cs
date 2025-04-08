@@ -32,6 +32,9 @@ public class MathChore : MonoBehaviour
     private List<string> questions = new List<string>();
     private List<int> correctAnswers = new List<int>();
 
+    private bool firstSetCompleted = false; // Tracks if addition/subtraction is done
+    private bool secondSetGenerated = false; // Tracks if multiplication set was already generated
+
     private void Start()
     {
         // Set up audio source
@@ -62,17 +65,71 @@ public class MathChore : MonoBehaviour
         questions.Clear();
         correctAnswers.Clear();
         string[] operators = { "+", "-" };
+        HashSet<string> usedQuestions = new HashSet<string>();
+
+        while (questions.Count < 5)
+        {
+            string op = operators[Random.Range(0, operators.Length)];
+            int num1 = Random.Range(1, 10);
+            int num2 = Random.Range(1, 10);
+
+            int result = op == "+" ? num1 + num2 : num1 - num2;
+
+            if (op == "-" && result < 0)
+            {
+                int temp = num1;
+                num1 = num2;
+                num2 = temp;
+                result = num1 - num2;
+            }
+
+            string question = $"{num1} {op} {num2} = ";
+
+            if (usedQuestions.Contains(question)) continue;
+
+            usedQuestions.Add(question);
+            questions.Add(question);
+            correctAnswers.Add(result);
+         
+        }
 
         for (int i = 0; i < 5; i++)
         {
-            string op = operators[Random.Range(0, operators.Length)];
-            int num1 = Random.Range(1, 9);
-            int num2 = op == "+" ? Random.Range(1, 9 - num1) : Random.Range(1, num1);
-
-            questions.Add($"{num1} {op} {num2} = ");
-            correctAnswers.Add(op == "+" ? num1 + num2 : num1 - num2);
             questionTexts[i].text = questions[i];
         }
+    }
+
+    private void GenerateMultiplicationQuestions()
+    {
+        questions.Clear();
+        correctAnswers.Clear();
+        HashSet<string> usedQuestions = new HashSet<string>();
+
+        while (questions.Count < 5)
+        {
+            int num1 = Random.Range(2, 10);
+            int num2 = Random.Range(2, 10); 
+            int result = num1 * num2;
+
+            if (result < 10 || result > 99) continue;
+
+            int smaller = Mathf.Min(num1, num2);
+            int larger = Mathf.Max(num1, num2);
+            string question = $"{smaller} × {larger} = ";
+
+            if (usedQuestions.Contains(question)) continue;
+
+            usedQuestions.Add(question);
+            questions.Add(question);
+            correctAnswers.Add(result);
+        }
+
+        for (int i = 0; i < 5; i++)
+        {
+            questionTexts[i].text = questions[i];
+        }
+
+        completedQuestions = new bool[5];
     }
 
     private void SetupUI()
@@ -110,7 +167,7 @@ public class MathChore : MonoBehaviour
             }
             
             int num = int.Parse(inputField.text);
-            if (num < 0 || num > 9)
+            if (num < 0 || num > 99)
                 inputField.text = "";
         }
     }
@@ -183,7 +240,16 @@ public class MathChore : MonoBehaviour
             if (!completed) return;
         }
 
-        CompleteMathChore();
+        if (!firstSetCompleted)
+        {
+            firstSetCompleted = true;
+            Debug.Log("First set complete. Switching to second set.");
+            StartCoroutine(SwitchToMultiplicationSet());
+        }
+        else
+        {
+            CompleteMathChore();
+        }
     }
 
     private void CompleteMathChore()
@@ -228,5 +294,14 @@ public class MathChore : MonoBehaviour
             if (!completedQuestions[i])
                 CheckAnswer(i);
         }
+    }
+
+    private IEnumerator SwitchToMultiplicationSet()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        secondSetGenerated = true;
+        GenerateMultiplicationQuestions();
+        SetupUI();
     }
 }
