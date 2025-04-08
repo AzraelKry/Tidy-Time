@@ -74,19 +74,23 @@ public class MathChore : MonoBehaviour
             {
                 // 5% chance for 0 or 1, 95% chance for 2-9
                 num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
-                
+
                 if (op == "+")
                 {
                     // For addition, ensure sum doesn't exceed 9
-                    // 5% chance for 0 or 1, 95% chance for 2-9
-                    num2 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10 - num1);
+                    // Calculate maximum possible second number
+                    int maxSecondNum = 9 - num1;
+                    if (maxSecondNum < 0) maxSecondNum = 0;
+
+                    // 5% chance for 0 or 1, 95% chance for 2-maxSecondNum
+                    num2 = Random.value < 0.05f ? Random.Range(0, Mathf.Min(2, maxSecondNum + 1)) : Random.Range(2, maxSecondNum + 1);
                     result = num1 + num2;
-                    validQuestion = result <= 9;
+                    validQuestion = true; // Now guaranteed to be ≤ 9
                 }
                 else // Subtraction
                 {
                     // For subtraction, ensure no negative results
-                    // 5% chance for 0 or 1, 95% chance for 2-9 (but can't be larger than num1)
+                    // 5% chance for 0 or 1, 95% chance for 2-num1 (since num2 can't be > num1)
                     num2 = Random.value < 0.05f ? Random.Range(0, Mathf.Min(2, num1 + 1)) : Random.Range(2, num1 + 1);
                     result = num1 - num2;
                     validQuestion = true; // Subtraction will always be valid since num2 <= num1
