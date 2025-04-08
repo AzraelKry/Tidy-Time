@@ -14,8 +14,8 @@ public class MathChore : MonoBehaviour
     public GameObject completionPanel;
 
     [Header("Colors")]
-    public Color correctColor = new Color(120f/255f, 255f/255f, 120f/255f);
-    public Color incorrectColor = new Color(255f/255f, 120f/255f, 120f/255f);
+    public Color correctColor = new Color(120f / 255f, 255f / 255f, 120f / 255f);
+    public Color incorrectColor = new Color(255f / 255f, 120f / 255f, 120f / 255f);
     public Color defaultColor = Color.white;
     public Color disabledColor = new Color(0.8f, 0.8f, 0.8f);
     [Range(0, 1)] public float highlightIntensity = 0.7f;
@@ -68,26 +68,26 @@ public class MathChore : MonoBehaviour
         {
             string op = operators[Random.Range(0, operators.Length)];
             int num1, num2, result;
-            
+
             if (op == "+")
             {
-                // Make 0 less likely in addition (10% chance for 0, 90% for 1-9)
-                num1 = Random.value < 0.9f ? Random.Range(1, 10) : 0;
+                // Make 0 less likely in addition (97% chance for 0, 90% for 1-9)
+                num1 = Random.value < 0.97f ? Random.Range(1, 10) : 0;
                 num2 = Random.Range(0, 10 - num1);
                 result = num1 + num2;
             }
             else // Subtraction
             {
                 // Make 0 and 1 less likely in subtraction
-                num1 = Random.value < 0.9f ? Random.Range(2, 10) : Random.Range(0, 2);
-                num2 = Random.Range(0, num1);
-                
+                num1 = Random.value < 0.97f ? Random.Range(2, 10) : Random.Range(0, 2);
+                num2 = Random.Range(0, num1 - 1);
+
                 // Ensure we don't get subtraction problems like x-0 too often
-                if (Random.value < 0.9f && num2 == 0)
+                if (Random.value < 0.96f && num2 == 0)
                 {
-                    num2 = Random.Range(1, num1);
+                    num2 = Random.Range(1, num1 - 1);
                 }
-                
+
                 result = num1 - num2;
             }
 
@@ -118,9 +118,9 @@ public class MathChore : MonoBehaviour
         while (!hasMultiplication)
         {
             int num1, num2;
-            
+
             // Make 0 and 1 less likely in multiplication
-            if (Random.value < 0.7f) // 70% chance for numbers 2-9
+            if (Random.value < 0.97f) // 97% chance for numbers 2-9
             {
                 num1 = Random.Range(2, 10);
                 num2 = Random.Range(2, 10);
@@ -130,9 +130,9 @@ public class MathChore : MonoBehaviour
                 num1 = Random.Range(0, 2);
                 num2 = Random.Range(0, 10);
             }
-            
+
             int result = num1 * num2;
-            
+
             if (result <= 9)
             {
                 string question = $"{num1} * {num2} = ";
@@ -281,7 +281,7 @@ public class MathChore : MonoBehaviour
 
         // Filter out non-digit characters (including negative signs)
         string cleanedInput = new string(inputField.text.Where(c => char.IsDigit(c)).ToArray());
-        
+
         // Only keep the last character entered (replace mode)
         if (cleanedInput.Length > 0)
         {
@@ -303,8 +303,8 @@ public class MathChore : MonoBehaviour
     {
         if (completedQuestions[questionIndex]) return;
 
-        bool isCorrect = !string.IsNullOrEmpty(answerInputs[questionIndex].text) && 
-                        int.TryParse(answerInputs[questionIndex].text, out int answer) && 
+        bool isCorrect = !string.IsNullOrEmpty(answerInputs[questionIndex].text) &&
+                        int.TryParse(answerInputs[questionIndex].text, out int answer) &&
                         answer == correctAnswers[questionIndex];
 
         // Update button color based on correctness (now happens here instead of during typing)
@@ -318,7 +318,7 @@ public class MathChore : MonoBehaviour
             completedQuestions[questionIndex] = true;
             answerInputs[questionIndex].interactable = false;
             checkButtons[questionIndex].interactable = false;
-            
+
             var colors = checkButtons[questionIndex].colors;
             colors.disabledColor = correctColor;
             checkButtons[questionIndex].colors = colors;
@@ -344,7 +344,7 @@ public class MathChore : MonoBehaviour
 
         Vector2 originalPos = rt.anchoredPosition;
         float elapsed = 0f;
-        
+
         while (elapsed < wrongAnswerShakeDuration)
         {
             float x = Random.Range(-1f, 1f) * wrongAnswerShakeIntensity;
@@ -353,7 +353,7 @@ public class MathChore : MonoBehaviour
             elapsed += Time.deltaTime;
             yield return null;
         }
-        
+
         rt.anchoredPosition = originalPos;
     }
 
@@ -416,7 +416,7 @@ public class MathChore : MonoBehaviour
             answerInputs[i].text = correctAnswers[i].ToString();
             answerInputs[i].interactable = false;
             checkButtons[i].interactable = false;
-            
+
             var colors = checkButtons[i].colors;
             colors.disabledColor = correctColor;
             checkButtons[i].colors = colors;
