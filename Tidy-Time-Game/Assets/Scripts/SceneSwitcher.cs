@@ -1,7 +1,3 @@
-/*
-This class contains all functions that allows for switching between scenes
-Attached to: Main Camera
-*/
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,40 +12,19 @@ public class SceneSwitcher : MonoBehaviour
 
     public void LaunchBedroom()
     {
-        // Reset all chores to incomplete
-        ChoreManager choreManager = ChoreManager.Instance;
-        if (choreManager != null)
-        {
-            choreManager.isAlphabetSoupCompleted = false;
-            choreManager.isSwapPlushiesCompleted = false;
-            choreManager.isMathHomeworkCompleted = false;
-            choreManager.isGarbageCompleted = false;
-            choreManager.isOrganizeClosetCompleted = false;
-            choreManager.isFeedFishCompleted = false;
-        }
+        ResetChoreManager();
+        PlushHeadSwap.MarkForReset();
+        ResetTimer();
 
-        // Reset the timer
-        TimerScript timer = FindObjectOfType<TimerScript>();
-        if (timer != null)
-        {
-            timer.SetTime(6, 0, 0);
-            timer.RestartTimer();
-        }
-
-        // Clear the saved player position to ensure spawn at default position
         if (DataManager.Instance != null)
         {
             DataManager.Instance.ClearPlayerPosition();
         }
 
-        // Destroy all persistent objects except essential managers
         DestroyAllPersistentObjects();
-
-        // Load the Bedroom scene
         SceneManager.LoadSceneAsync(2);
     }
 
-    // Other scene switching methods remain the same...
     public void PlayBedroom()
     {
         SetPlayerPosition();
@@ -127,16 +102,14 @@ public class SceneSwitcher : MonoBehaviour
 
     public void LoadMainMenu()
     {
-        // Reset all game state
         if (DataManager.Instance != null)
         {
             DataManager.Instance.ClearAllData();
         }
 
-        // Reset time scale
+        PlushHeadSwap.MarkForReset();
+        ResetChoreManager();
         Time.timeScale = 1f;
-
-        // Load the main menu
         SceneManager.LoadSceneAsync(0);
     }
 
@@ -190,10 +163,8 @@ public class SceneSwitcher : MonoBehaviour
     private void DestroyAllPersistentObjects()
     {
         GameObject[] allObjects = Object.FindObjectsOfType<GameObject>();
-
         foreach (GameObject obj in allObjects)
         {
-            // Skip essential system objects
             if (obj == gameObject) continue;
             if (obj.GetComponent<DataManager>() != null) continue;
             if (obj.GetComponent<ChoreManager>() != null) continue;

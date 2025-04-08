@@ -10,169 +10,78 @@ public class PlushHeadSwap : MonoBehaviour
     private bool isLocked = false;
     private Color originalColor;
     private SpriteRenderer spriteRenderer;
-    private PolygonCollider2D polyCollider;
 
     public Transform correctBody;
     public float snapThreshold = 0.5f;
     public float lockThreshold = 0.3f;
     public float hoverAlpha = 0.6f;
     public float hoverBeforePickupAlpha = 0.8f;
+    public float swapHighlightAlpha = 0.5f;
 
     [Header("Audio")]
-    public AudioSource swapAudioSource; // Assign a single shared AudioSource in Inspector
+    public AudioSource swapAudioSource;
 
-    private List<Transform> availableBodies = new List<Transform>();
-    private Dictionary<Transform, PlushHeadSwap> bodyToHeadMap = new Dictionary<Transform, PlushHeadSwap>();
-    private static List<Transform> occupiedBodies = new List<Transform>();
-    private static bool positionsInitialized = false;
+    private static List<Transform> allBodies = new List<Transform>();
+    private static Dictionary<Transform, PlushHeadSwap> bodyToHeadMap = new Dictionary<Transform, PlushHeadSwap>();
+    private static bool initialized = false;
+    private static bool shouldResetOnLoad = false;
 
     void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         originalColor = spriteRenderer.color;
-        polyCollider = GetComponent<PolygonCollider2D>();
+
+        // Reset static variables if needed
+        if (shouldResetOnLoad)
+        {
+            allBodies.Clear();
+            bodyToHeadMap.Clear();
+            initialized = false;
+            shouldResetOnLoad = false;
+        }
+
+        // Initialize the list of all bodies once
+        if (!initialized)
+        {
+            initialized = true;
+            PlushHeadSwap[] allHeads = FindObjectsOfType<PlushHeadSwap>();
+            foreach (PlushHeadSwap head in allHeads)
+            {
+                if (head.correctBody != null && !allBodies.Contains(head.correctBody))
+                {
+                    allBodies.Add(head.correctBody);
+                }
+            }
+        }
     }
 
     void Start()
     {
-        InitializeBodies();
+        // Assign to a random unoccupied body position at start
+        List<Transform> availableBodies = new List<Transform>(allBodies);
+        availableBodies.Remove(correctBody);
 
-        if (!positionsInitialized)
+        // Remove already occupied bodies
+        List<Transform> occupiedBodies = new List<Transform>(bodyToHeadMap.Keys);
+        availableBodies.RemoveAll(body => occupiedBodies.Contains(body));
+
+        if (availableBodies.Count > 0)
         {
-            occupiedBodies.Clear();
-            positionsInitialized = true;
-        }
-
-        if (SaveManager.Instance != null)
-        {
-            Vector3 savedPosition = SaveManager.Instance.GetPlushiePosition(gameObject.name, Vector3.zero);
-            if (savedPosition != Vector3.zero)
-            {
-                bool positionValid = false;
-                foreach (var body in availableBodies)
-                {
-                    if (body != null && Vector3.Distance(savedPosition, body.position) < snapThreshold)
-                    {
-                        positionValid = true;
-                        break;
-                    }
-                }
-
-                if (positionValid)
-                {
-                    transform.position = savedPosition;
-                    startPosition = savedPosition;
-                }
-                else
-                {
-                    AssignRandomPosition();
-                }
-            }
-            else
-            {
-                AssignRandomPosition();
-            }
+            int randomIndex = Random.Range(0, availableBodies.Count);
+            Transform startBody = availableBodies[randomIndex];
+            
+            transform.position = startBody.position;
+            startPosition = startBody.position;
+            bodyToHeadMap[startBody] = this;
         }
         else
         {
-            AssignRandomPosition();
+            transform.position = correctBody.position;
+            startPosition = correctBody.position;
+            bodyToHeadMap[correctBody] = this;
         }
 
-        UpdateBodyMapping(this);
         CheckAndUpdateLockStatus(true);
-    }
-
-    private void InitializeBodies()
-    {
-        availableBodies.Clear();
-        bodyToHeadMap.Clear();
-
-        PlushHeadSwap[] allHeads = FindObjectsOfType<PlushHeadSwap>();
-        foreach (PlushHeadSwap head in allHeads)
-        {
-            if (head.correctBody != null && !availableBodies.Contains(head.correctBody))
-            {
-                availableBodies.Add(head.correctBody);
-            }
-        }
-    }
-
-    private void AssignRandomPosition()
-    {
-        if (availableBodies.Count == 0) return;
-
-        // Create a list of possible bodies excluding our own correct body
-        List<Transform> possibleBodies = new List<Transform>();
-        foreach (var body in availableBodies)
-        {
-            if (body == null || body == correctBody) continue;
-            possibleBodies.Add(body);
-        }
-
-        // If no bodies left (edge case with only 1 plushie), use all available
-        if (possibleBodies.Count == 0)
-        {
-            foreach (var body in availableBodies)
-            {
-                if (body != null) possibleBodies.Add(body);
-            }
-        }
-
-        List<Transform> unoccupiedBodies = new List<Transform>();
-        foreach (var body in possibleBodies)
-        {
-            if (!occupiedBodies.Contains(body))
-            {
-                unoccupiedBodies.Add(body);
-            }
-        }
-
-        // If no unoccupied bodies, use all possible bodies
-        if (unoccupiedBodies.Count == 0)
-        {
-            unoccupiedBodies = new List<Transform>(possibleBodies);
-        }
-
-        if (unoccupiedBodies.Count > 0)
-        {
-            int randomIndex = Random.Range(0, unoccupiedBodies.Count);
-            Transform selectedBody = unoccupiedBodies[randomIndex];
-            
-            if (selectedBody != null)
-            {
-                if (occupiedBodies.Contains(selectedBody))
-                {
-                    PlushHeadSwap otherHead = bodyToHeadMap[selectedBody];
-                    otherHead.startPosition = GetRandomPositionNearby(selectedBody.position);
-                    otherHead.transform.position = otherHead.startPosition;
-                    bodyToHeadMap.Remove(selectedBody);
-                    occupiedBodies.Remove(selectedBody);
-                }
-
-                transform.position = selectedBody.position;
-                startPosition = selectedBody.position;
-                
-                occupiedBodies.Add(selectedBody);
-                bodyToHeadMap[selectedBody] = this;
-            }
-        }
-        else
-        {
-            // Fallback position near a random body (not our own)
-            Transform fallbackBody = possibleBodies.Count > 0 
-                ? possibleBodies[Random.Range(0, possibleBodies.Count)] 
-                : availableBodies[Random.Range(0, availableBodies.Count)];
-            
-            startPosition = GetRandomPositionNearby(fallbackBody.position);
-            transform.position = startPosition;
-        }
-
-        isLocked = false;
-    }
-
-    private Vector3 GetRandomPositionNearby(Vector3 basePosition)
-    {
-        return basePosition + new Vector3(Random.Range(-1f, 1f), Random.Range(-1f, 1f), 0);
     }
 
     private void OnMouseEnter()
@@ -195,7 +104,7 @@ public class PlushHeadSwap : MonoBehaviour
     {
         if (isLocked) return;
 
-        ResetTransparency();
+        ResetAllTransparency();
         isDragging = true;
         Vector3 mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouseWorldPos.z = transform.position.z;
@@ -206,10 +115,6 @@ public class PlushHeadSwap : MonoBehaviour
             if (pair.Value == this)
             {
                 bodyToHeadMap.Remove(pair.Key);
-                if (occupiedBodies.Contains(pair.Key))
-                {
-                    occupiedBodies.Remove(pair.Key);
-                }
                 break;
             }
         }
@@ -223,31 +128,20 @@ public class PlushHeadSwap : MonoBehaviour
             mousePosition.z = transform.position.z;
             transform.position = mousePosition + dragOffset;
 
-            CheckForHoveredHeads();
-        }
-    }
-
-    private void CheckForHoveredHeads()
-    {
-        PlushHeadSwap[] allHeads = FindObjectsOfType<PlushHeadSwap>();
-        Vector2 currentPos = transform.position;
-        
-        foreach (PlushHeadSwap head in allHeads)
-        {
-            if (head != this && !head.isDragging && head.polyCollider != null)
+            foreach (Transform body in allBodies)
             {
-                if (head.polyCollider.OverlapPoint(currentPos))
+                if (bodyToHeadMap.ContainsKey(body))
                 {
-                    head.SetTransparency(hoverAlpha);
+                    PlushHeadSwap otherHead = bodyToHeadMap[body];
+                    if (otherHead != this && Vector3.Distance(transform.position, body.position) < snapThreshold)
+                    {
+                        otherHead.SetTransparency(swapHighlightAlpha);
+                    }
+                    else
+                    {
+                        otherHead.ResetTransparency();
+                    }
                 }
-                else
-                {
-                    head.ResetTransparency();
-                }
-            }
-            else
-            {
-                head.ResetTransparency();
             }
         }
     }
@@ -256,137 +150,15 @@ public class PlushHeadSwap : MonoBehaviour
     {
         if (isLocked) return;
         
-        ResetAllHeadsTransparency();
+        ResetAllTransparency();
         isDragging = false;
-
-        if (correctBody == null)
-        {
-            transform.position = startPosition;
-            return;
-        }
-
-        float distanceToCorrect = Vector3.Distance(transform.position, correctBody.position);
-        if (distanceToCorrect < snapThreshold)
-        {
-            if (bodyToHeadMap.ContainsKey(correctBody))
-            {
-                PlushHeadSwap otherHead = bodyToHeadMap[correctBody];
-                SwapWithHead(otherHead);
-            }
-            else
-            {
-                transform.position = startPosition;
-                ReassignToPreviousBody();
-            }
-            return;
-        }
-
-        PlushHeadSwap targetHead = null;
-        PlushHeadSwap[] allHeads = FindObjectsOfType<PlushHeadSwap>();
-        
-        foreach (PlushHeadSwap head in allHeads)
-        {
-            if (head != this && !head.isDragging && head.polyCollider != null)
-            {
-                if (head.polyCollider.OverlapPoint(transform.position))
-                {
-                    targetHead = head;
-                    break;
-                }
-            }
-        }
-
-        if (targetHead != null)
-        {
-            SwapWithHead(targetHead);
-        }
-        else
-        {
-            transform.position = startPosition;
-            ReassignToPreviousBody();
-        }
-
-        if (SaveManager.Instance != null)
-        {
-            SaveManager.Instance.SavePlushiePosition(gameObject.name, transform.position);
-        }
-    }
-
-    private void ReassignToPreviousBody()
-    {
-        foreach (var body in availableBodies)
-        {
-            if (body != null && Vector3.Distance(startPosition, body.position) < 0.1f)
-            {
-                bodyToHeadMap[body] = this;
-                if (!occupiedBodies.Contains(body))
-                {
-                    occupiedBodies.Add(body);
-                }
-                break;
-            }
-        }
-    }
-
-    private void SwapWithHead(PlushHeadSwap otherHead)
-    {
-        if (otherHead == null) return;
-
-        // Play swap sound using the shared AudioSource
-        if (swapAudioSource != null && !swapAudioSource.isPlaying)
-        {
-            swapAudioSource.Play();
-        }
-
-        Vector3 tempPosition = startPosition;
-        startPosition = otherHead.startPosition;
-        otherHead.startPosition = tempPosition;
-
-        transform.position = startPosition;
-        otherHead.transform.position = otherHead.startPosition;
-
-        UpdateBodyMapping(this);
-        UpdateBodyMapping(otherHead);
-
-        CheckAndUpdateLockStatus(true);
-        otherHead.CheckAndUpdateLockStatus(true);
-
-        if (SaveManager.Instance != null)
-        {
-            SaveManager.Instance.SavePlushiePosition(gameObject.name, transform.position);
-            SaveManager.Instance.SavePlushiePosition(otherHead.gameObject.name, otherHead.transform.position);
-        }
-
-        if (PlushGameManager.Instance != null)
-        {
-            PlushGameManager.Instance.CheckTaskCompletion();
-        }
-    }
-
-    private void UpdateBodyMapping(PlushHeadSwap head)
-    {
-        List<Transform> toRemove = new List<Transform>();
-        foreach (var pair in bodyToHeadMap)
-        {
-            if (pair.Value == head)
-            {
-                toRemove.Add(pair.Key);
-            }
-        }
-        foreach (var key in toRemove)
-        {
-            bodyToHeadMap.Remove(key);
-            occupiedBodies.Remove(key);
-        }
 
         Transform closestBody = null;
         float closestDistance = float.MaxValue;
 
-        foreach (var body in availableBodies)
+        foreach (Transform body in allBodies)
         {
-            if (body == null) continue;
-            
-            float distance = Vector3.Distance(head.transform.position, body.position);
+            float distance = Vector3.Distance(transform.position, body.position);
             if (distance < snapThreshold && distance < closestDistance)
             {
                 closestDistance = distance;
@@ -399,33 +171,84 @@ public class PlushHeadSwap : MonoBehaviour
             if (bodyToHeadMap.ContainsKey(closestBody))
             {
                 PlushHeadSwap otherHead = bodyToHeadMap[closestBody];
-                otherHead.startPosition = GetRandomPositionNearby(closestBody.position);
-                otherHead.transform.position = otherHead.startPosition;
+                otherHead.transform.position = startPosition;
                 bodyToHeadMap.Remove(closestBody);
-                occupiedBodies.Remove(closestBody);
+                
+                otherHead.startPosition = startPosition;
+                bodyToHeadMap[startPosition == correctBody.position ? correctBody : GetBodyAtPosition(startPosition)] = otherHead;
+                otherHead.CheckAndUpdateLockStatus(true);
+                
+                if (swapAudioSource != null && !swapAudioSource.isPlaying)
+                {
+                    swapAudioSource.Play();
+                }
             }
 
-            bodyToHeadMap[closestBody] = head;
-            if (!occupiedBodies.Contains(closestBody))
-            {
-                occupiedBodies.Add(closestBody);
-            }
+            transform.position = closestBody.position;
+            startPosition = closestBody.position;
+            bodyToHeadMap[closestBody] = this;
+        }
+        else
+        {
+            transform.position = startPosition;
+            bodyToHeadMap[startPosition == correctBody.position ? correctBody : GetBodyAtPosition(startPosition)] = this;
+        }
 
-            if (closestDistance < lockThreshold)
-            {
-                head.transform.position = closestBody.position;
-                head.startPosition = closestBody.position;
-            }
+        CheckAndUpdateLockStatus(true);
+
+        if (PlushGameManager.Instance != null)
+        {
+            PlushGameManager.Instance.CheckTaskCompletion();
         }
     }
 
-    private void ResetAllHeadsTransparency()
+    private Transform GetBodyAtPosition(Vector3 position)
     {
-        PlushHeadSwap[] allHeads = FindObjectsOfType<PlushHeadSwap>();
-        foreach (PlushHeadSwap head in allHeads)
+        foreach (Transform body in allBodies)
+        {
+            if (Vector3.Distance(position, body.position) < 0.1f)
+            {
+                return body;
+            }
+        }
+        return null;
+    }
+
+    private void ResetAllTransparency()
+    {
+        foreach (PlushHeadSwap head in FindObjectsOfType<PlushHeadSwap>())
         {
             head.ResetTransparency();
         }
+    }
+
+    private void CheckAndUpdateLockStatus(bool forceCheck = false)
+    {
+        if (correctBody == null) return;
+
+        float distance = Vector3.Distance(transform.position, correctBody.position);
+        bool shouldBeLocked = distance < lockThreshold;
+
+        if (shouldBeLocked)
+        {
+            transform.position = correctBody.position;
+            startPosition = correctBody.position;
+            isLocked = true;
+            
+            if (!bodyToHeadMap.ContainsKey(correctBody) || bodyToHeadMap[correctBody] != this)
+            {
+                bodyToHeadMap[correctBody] = this;
+            }
+        }
+        else if (forceCheck || isLocked)
+        {
+            isLocked = false;
+        }
+    }
+
+    public bool IsCorrectlyPlaced()
+    {
+        return isLocked;
     }
 
     public void SetTransparency(float alpha)
@@ -446,37 +269,8 @@ public class PlushHeadSwap : MonoBehaviour
         }
     }
 
-    private void CheckAndUpdateLockStatus(bool forceCheck = false)
+    public static void MarkForReset()
     {
-        if (correctBody == null) return;
-
-        float distance = Vector3.Distance(transform.position, correctBody.position);
-        bool shouldBeLocked = distance < lockThreshold;
-
-        if (shouldBeLocked)
-        {
-            transform.position = correctBody.position;
-            startPosition = correctBody.position;
-            isLocked = true;
-            
-            if (!bodyToHeadMap.ContainsKey(correctBody) || bodyToHeadMap[correctBody] != this)
-            {
-                UpdateBodyMapping(this);
-            }
-        }
-        else if (forceCheck || isLocked)
-        {
-            isLocked = false;
-        }
-    }
-
-    public bool IsCorrectlyPlaced()
-    {
-        return isLocked;
-    }
-
-    private void OnDestroy()
-    {
-        positionsInitialized = false;
+        shouldResetOnLoad = true;
     }
 }
