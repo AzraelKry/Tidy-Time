@@ -72,19 +72,27 @@ public class MathChore : MonoBehaviour
 
             while (!validQuestion)
             {
-                // 5% chance for 0 or 1, 95% chance for 2-9
-                num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
-
-                if (op == "+")
+                // For subtraction, we need to ensure num1 >= num2
+                if (op == "-")
                 {
+                    // Generate num1 first (2-9, with 5% chance for 0-1)
+                    num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
+
+                    // Then generate num2 that's <= num1
+                    // 5% chance for 0 or 1, 95% chance for 2 up to num1
+                    num2 = Random.value < 0.05f ? Random.Range(0, Mathf.Min(2, num1 + 1)) : Random.Range(2, num1 + 1);
+                    result = num1 - num2;
+                    validQuestion = true; // Guaranteed non-negative since num2 <= num1
+                }
+                else // Addition
+                {
+                    // 5% chance for 0 or 1, 95% chance for 2-9
+                    num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
+
                     // For addition, ensure sum doesn't exceed 9
-                    // Calculate maximum possible second number
                     int maxSecondNum = 9 - num1;
                     if (maxSecondNum <= 0)
                     {
-                        // If num1 is 9, maxSecondNum would be 0
-                        // If num1 is 8, maxSecondNum would be 1
-                        // So we'll adjust num1 to ensure we don't get 8+2 or similar
                         continue; // Skip this iteration and try again
                     }
 
@@ -94,16 +102,7 @@ public class MathChore : MonoBehaviour
 
                     // Double-check that result is <= 9
                     if (result > 9) continue;
-
                     validQuestion = true;
-                }
-                else // Subtraction
-                {
-                    // For subtraction, ensure no negative results
-                    // 5% chance for 0 or 1, 95% chance for 2-num1 (since num2 can't be > num1)
-                    num2 = Random.value < 0.05f ? Random.Range(0, Mathf.Min(2, num1 + 1)) : Random.Range(2, num1 + 1);
-                    result = num1 - num2;
-                    validQuestion = true; // Subtraction will always be valid since num2 <= num1
                 }
 
                 if (validQuestion)
@@ -141,7 +140,7 @@ public class MathChore : MonoBehaviour
         bool hasMultiplication = false;
         while (!hasMultiplication)
         {
-            int num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 4); // Limit first number for multiplication to ensure product ≤ 9
+            int num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 4); // Limit first number for multiplication
             int num2 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 4); // Limit second number for multiplication
             int result = num1 * num2;
 
@@ -167,48 +166,52 @@ public class MathChore : MonoBehaviour
 
             while (!validQuestion)
             {
-                // 5% chance for 0 or 1, 95% chance for 2-9
-                num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
-
-                if (op == "*")
+                if (op == "-")
                 {
-                    // For multiplication, ensure product ≤ 9
-                    // Limit second number based on first number
+                    // For subtraction, generate num1 first
+                    num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
+
+                    // Then generate num2 that's <= num1
+                    num2 = Random.value < 0.05f ? Random.Range(0, Mathf.Min(2, num1 + 1)) : Random.Range(2, num1 + 1);
+                    result = num1 - num2;
+                    validQuestion = true; // Guaranteed non-negative
+                }
+                else if (op == "+")
+                {
+                    // 5% chance for 0 or 1, 95% chance for 2-9
+                    num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
+
+                    // Ensure sum doesn't exceed 9
+                    int maxSecondNum = 9 - num1;
+                    if (maxSecondNum <= 0)
+                    {
+                        continue;
+                    }
+
+                    num2 = Random.value < 0.05f ? Random.Range(0, Mathf.Min(2, maxSecondNum + 1)) : Random.Range(2, maxSecondNum + 1);
+                    result = num1 + num2;
+                    validQuestion = result <= 9;
+                }
+                else // Multiplication
+                {
+                    // 5% chance for 0 or 1, 95% chance for 2-9
+                    num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
+
+                    // Limit second number to keep product ≤ 9
                     int maxSecondNum = num1 == 0 ? 9 : Mathf.FloorToInt(9f / num1);
                     if (maxSecondNum < 2)
                     {
-                        continue; // Skip and try again
+                        continue;
                     }
 
                     num2 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, maxSecondNum + 1);
                     result = num1 * num2;
                     validQuestion = result <= 9;
                 }
-                else if (op == "+")
-                {
-                    // Ensure sum doesn't exceed 9
-                    int maxSecondNum = 9 - num1;
-                    if (maxSecondNum <= 0)
-                    {
-                        continue; // Skip and try again
-                    }
-
-                    num2 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, maxSecondNum + 1);
-                    result = num1 + num2;
-                    validQuestion = result <= 9;
-                }
-                else // Subtraction
-                {
-                    // Ensure no negative results
-                    num2 = Random.value < 0.05f ? Random.Range(0, Mathf.Min(2, num1 + 1)) : Random.Range(2, num1 + 1);
-                    result = num1 - num2;
-                    validQuestion = true;
-                }
 
                 if (validQuestion)
                 {
                     string question = $"{num1} {op} {num2} = ";
-
                     if (!usedQuestions.Contains(question))
                     {
                         usedQuestions.Add(question);
