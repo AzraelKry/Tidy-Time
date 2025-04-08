@@ -71,23 +71,30 @@ public class MathChore : MonoBehaviour
 
             if (op == "+")
             {
-                // Make 0 less likely in addition (97% chance for 0, 90% for 1-9)
-                num1 = Random.value < 0.97f ? Random.Range(1, 10) : 0;
+                // 5% chance for 0 or 1, 95% chance for 2-9
+                num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
                 num2 = Random.Range(0, 10 - num1);
+                
+                // Ensure num2 also follows the 5% rule for 0 or 1
+                if (Random.value >= 0.05f && num2 < 2)
+                {
+                    num2 = Random.Range(2, 10 - num1);
+                }
+                
                 result = num1 + num2;
             }
             else // Subtraction
             {
-                // Make 0 and 1 less likely in subtraction
-                num1 = Random.value < 0.97f ? Random.Range(2, 10) : Random.Range(0, 2);
-                num2 = Random.Range(0, num1 - 1);
-
-                // Ensure we don't get subtraction problems like x-0 too often
-                if (Random.value < 0.96f && num2 == 0)
+                // 5% chance for 0 or 1, 95% chance for 2-9
+                num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
+                num2 = Random.Range(0, num1);
+                
+                // Ensure num2 also follows the 5% rule for 0 or 1
+                if (Random.value >= 0.05f && num2 < 2 && num1 > 2)
                 {
-                    num2 = Random.Range(1, num1 - 1);
+                    num2 = Random.Range(2, num1);
                 }
-
+                
                 result = num1 - num2;
             }
 
@@ -119,17 +126,9 @@ public class MathChore : MonoBehaviour
         {
             int num1, num2;
 
-            // Make 0 and 1 less likely in multiplication
-            if (Random.value < 0.97f) // 97% chance for numbers 2-9
-            {
-                num1 = Random.Range(2, 10);
-                num2 = Random.Range(2, 10);
-            }
-            else // 30% chance for 0 or 1
-            {
-                num1 = Random.Range(0, 2);
-                num2 = Random.Range(0, 10);
-            }
+            // 5% chance for 0 or 1, 95% chance for 2-9
+            num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
+            num2 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
 
             int result = num1 * num2;
 
@@ -155,35 +154,33 @@ public class MathChore : MonoBehaviour
 
             while (!validQuestion)
             {
+                // 5% chance for 0 or 1, 95% chance for 2-9 (applies to all operations)
+                num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
+                num2 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
+
                 if (op == "*")
                 {
-                    // Make 0 and 1 less likely in multiplication
-                    if (Random.value < 0.7f) // 70% chance for numbers 2-9
-                    {
-                        num1 = Random.Range(2, 10);
-                        num2 = Random.Range(2, 10);
-                    }
-                    else // 30% chance for 0 or 1
-                    {
-                        num1 = Random.Range(0, 2);
-                        num2 = Random.Range(0, 10);
-                    }
                     result = num1 * num2;
                     validQuestion = result <= 9;
                 }
                 else if (op == "+")
                 {
-                    // Regular addition (no negatives in advanced section)
-                    num1 = Random.Range(0, 10);
-                    num2 = Random.Range(0, 10 - num1);
+                    // Ensure sum doesn't exceed 9
+                    if (num1 + num2 > 9)
+                    {
+                        num2 = 9 - num1;
+                        if (num2 < 0) num2 = 0;
+                    }
                     result = num1 + num2;
                     validQuestion = true;
                 }
                 else // Subtraction
                 {
-                    // Regular subtraction (no negatives in advanced section)
-                    num1 = Random.Range(1, 10);
-                    num2 = Random.Range(0, num1 + 1);
+                    // Ensure no negative results
+                    if (num2 > num1)
+                    {
+                        num2 = num1;
+                    }
                     result = num1 - num2;
                     validQuestion = true;
                 }
@@ -261,7 +258,6 @@ public class MathChore : MonoBehaviour
     private void OnInputChanged(int index)
     {
         ValidateInput(answerInputs[index]);
-        // Removed the UpdateButtonState call here so color only changes on button click
     }
 
     private void OnCheckButtonClicked(int index)
@@ -307,7 +303,7 @@ public class MathChore : MonoBehaviour
                         int.TryParse(answerInputs[questionIndex].text, out int answer) &&
                         answer == correctAnswers[questionIndex];
 
-        // Update button color based on correctness (now happens here instead of during typing)
+        // Update button color based on correctness
         UpdateButtonState(questionIndex, isCorrect);
 
         if (isCorrect)
