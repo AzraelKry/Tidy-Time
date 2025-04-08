@@ -1261,7 +1261,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Here's a particpation trophy
+  m_text: Here's a participation trophy
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: e76d8cf3320317143ae4855d947d3996, type: 2}
   m_sharedMaterial: {fileID: 3131687981373203614, guid: e76d8cf3320317143ae4855d947d3996, type: 2}
