@@ -68,43 +68,46 @@ public class MathChore : MonoBehaviour
         {
             string op = operators[Random.Range(0, operators.Length)];
             int num1, num2, result;
+            bool validQuestion = false;
 
-            if (op == "+") // Addition
+            while (!validQuestion)
             {
                 // 5% chance for 0 or 1, 95% chance for 2-9
                 num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
-                num2 = Random.Range(0, 10 - num1);
                 
-                // Ensure num2 also follows the 5% rule for 0 or 1
-                if (Random.value >= 0.05f && num2 < 2)
+                if (op == "+")
                 {
-                    num2 = Random.Range(2, 10 - num1);
+                    // For addition, ensure sum doesn't exceed 9
+                    // 5% chance for 0 or 1, 95% chance for 2-9
+                    num2 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10 - num1);
+                    result = num1 + num2;
+                    validQuestion = result <= 9;
                 }
-                
-                result = num1 + num2;
-            }
-            else // Subtraction
-            {
-                // 5% chance for 0 or 1, 95% chance for 2-9
-                num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
-                num2 = Random.Range(0, num1);
-                
-                // Ensure num2 also follows the 5% rule for 0 or 1
-                if (Random.value >= 0.05f && num2 < 2 && num1 > 2)
+                else // Subtraction
                 {
-                    num2 = Random.Range(2, num1);
+                    // For subtraction, ensure no negative results
+                    // 5% chance for 0 or 1, 95% chance for 2-9 (but can't be larger than num1)
+                    num2 = Random.value < 0.05f ? Random.Range(0, Mathf.Min(2, num1 + 1)) : Random.Range(2, num1 + 1);
+                    result = num1 - num2;
+                    validQuestion = true; // Subtraction will always be valid since num2 <= num1
                 }
-                
-                result = num1 - num2;
+
+                if (validQuestion)
+                {
+                    string question = $"{num1} {op} {num2} = ";
+                    if (!usedQuestions.Contains(question))
+                    {
+                        usedQuestions.Add(question);
+                        questions.Add(question);
+                        correctAnswers.Add(result);
+                        validQuestion = true;
+                    }
+                    else
+                    {
+                        validQuestion = false;
+                    }
+                }
             }
-
-            string question = $"{num1} {op} {num2} = ";
-
-            if (usedQuestions.Contains(question)) continue;
-
-            usedQuestions.Add(question);
-            questions.Add(question);
-            correctAnswers.Add(result);
         }
 
         for (int i = 0; i < 5; i++)
@@ -124,12 +127,8 @@ public class MathChore : MonoBehaviour
         bool hasMultiplication = false;
         while (!hasMultiplication)
         {
-            int num1, num2;
-
-            // 5% chance for 0 or 1, 95% chance for 2-9
-            num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
-            num2 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
-
+            int num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
+            int num2 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
             int result = num1 * num2;
 
             if (result <= 9)
@@ -154,7 +153,7 @@ public class MathChore : MonoBehaviour
 
             while (!validQuestion)
             {
-                // 5% chance for 0 or 1, 95% chance for 2-9 (applies to all operations)
+                // 5% chance for 0 or 1, 95% chance for 2-9
                 num1 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
                 num2 = Random.value < 0.05f ? Random.Range(0, 2) : Random.Range(2, 10);
 
